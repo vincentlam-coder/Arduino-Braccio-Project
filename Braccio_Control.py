@@ -84,7 +84,7 @@ class Braccio():
 
     #method to compute inverse kinematics
     def IK(self,target_pos,num_pts,counter_limit):
-        error_threshold = 0.02 #define error threshold in m
+        error_threshold = 0.01 #define error threshold in m
         q_init = [0,-120,60,115,0] #robot initial configuration
         q_init = np.radians(q_init) #convert from degrees to radians
         T_init = self.FK(q_init)
@@ -134,16 +134,26 @@ class Braccio():
                 counter = counter + 1 #increment counter
 
         return T_cur, q_vector, error
-        
+
+    #method for q remapping to servo angles
+    def q_remapping(self,q_vector):
+        q_vector = np.rad2deg(q_vector) #convert to degrees
+        q_vector[0] = -q_vector[0] + 90 #M1
+        q_vector[1] = q_vector[1] + 180 #M2
+        q_vector[2] = q_vector[2] + 90 #M3
+        q_vector[4] = q_vector[4] + 90 #M5
+
+        return q_vector
+
 robot = Braccio(0.0715,0.125,0.125,0.192)
-target_pos = [0.35,-0.25,0.1]
+target_pos = [0.1,0.35,0.2]
 counter_limit = 70
 num_pts = 15
 
 T,q,error = robot.IK(target_pos,num_pts,counter_limit)
 
-print(T)
-print("q vector")
-print(np.rad2deg(q))
-print("error")
-print(error)
+T_actual = robot.FK(q)
+print('position -> ', T_actual[0:3,3])
+print('error -> ', error)
+qdeg = np.rad2deg(q)
+print('q -> ', qdeg)

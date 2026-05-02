@@ -1,18 +1,22 @@
+#include <Braccio.h>
 #include <Servo.h>
 
-Servo servo;
+Servo base;
+Servo shoulder;
+Servo elbow;
+Servo wrist_rot;
+Servo wrist_ver;
+Servo gripper;
 
-int angles[6] = {0,0,0,0,0,0};
+int angles[5] = {0,0,0,0,0};
+const int GRIP_OPEN = 10;
+const int GRIP_CLOSE = 73;
 
 void setup() {
   //put your setup code here, to run once:
-  //Braccio.begin();
-  //Braccio.ServoMovement(20, 90, 90, 90, 90, 90, 73);
-  servo.attach(7);
+  Braccio.begin();
+  Braccio.ServoMovement(20, 90, 90, 90, 90, 90, 73);
   Serial.begin(9600);
-  servo.write(0);
-  delay(1000);
-  servo.write(180);
 }
 
 void loop() {
@@ -21,7 +25,7 @@ void loop() {
   {
     String data = Serial.readStringUntil('\n');
     update_angles(data);
-    servo.write(angles[5]);
+    Braccio.ServoMovement(100, angles[0], angles[1], angles[2], angles[3], angles[4], GRIP_CLOSE);
   }
 }
 
@@ -32,7 +36,7 @@ void update_angles(String data)
   int i = 0; //index for string
 
   //outer for loop iterates through angles
-  for (int j = 0; j < 6; j++)
+  for (int j = 0; j < 5; j++)
   {
     //inner for loop iterates through data string
     for (int k = i + 1; k < length; k++)
@@ -55,5 +59,4 @@ void update_angles(String data)
     }
   }
 }
-
 
